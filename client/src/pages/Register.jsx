@@ -57,7 +57,7 @@ function Register() {
                     <h1>Start Your Connection.</h1>
                     <p>
                         Create your account and connect with
-                        friends through messages and video calls.
+                        friends through instant real-time messaging.
                     </p>
                 </div>
 

@@ -9,7 +9,8 @@ const {
     sendFriendRequest,
     getFriendRequests,
     respondToRequest,
-    getFriends
+    getFriends,
+    removeFriend
 } = require("../controllers/friendController");
 
 router.get("/search", authMiddleware, searchUsers);
@@ -21,5 +22,7 @@ router.get("/requests", authMiddleware, getFriendRequests);
 router.patch("/request/:id", authMiddleware, respondToRequest);
 
 router.get("/list", authMiddleware, getFriends);
+
+router.delete("/:id", authMiddleware, removeFriend);
 
 module.exports = router;

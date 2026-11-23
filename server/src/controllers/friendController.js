@@ -85,8 +85,22 @@ const sendFriendRequest = async (req, res) => {
             data: {
                 senderId,
                 receiverId
+            },
+            include: {
+                sender: {
+                    select: {
+                        id: true,
+                        name: true,
+                        username: true
+                    }
+                }
             }
         });
+
+        const io = req.app.get("io");
+        if (io) {
+            io.to(`user:${receiverId}`).emit("friend-request-received", request);
+        }
 
         return res.status(201).json({
             message: "Friend request sent",
@@ -162,8 +176,32 @@ const respondToRequest = async (req, res) => {
 
         const updatedRequest = await prisma.friendRequest.update({
             where: { id: requestId },
-            data: { status }
+            data: { status },
+            include: {
+                sender: {
+                    select: { id: true, name: true, username: true }
+                },
+                receiver: {
+                    select: { id: true, name: true, username: true }
+                }
+            }
         });
+
+        const io = req.app.get("io");
+        if (io) {
+            if (status === "ACCEPTED") {
+                io.to(`user:${updatedRequest.senderId}`).emit("friend-request-accepted", {
+                    friend: updatedRequest.receiver
+                });
+                io.to(`user:${updatedRequest.receiverId}`).emit("friend-request-accepted", {
+                    friend: updatedRequest.sender
+                });
+            } else if (status === "REJECTED") {
+                io.to(`user:${updatedRequest.senderId}`).emit("friend-request-rejected", {
+                    requestId: updatedRequest.id
+                });
+            }
+        }
 
         return res.status(200).json({
             message: `Friend request ${status.toLowerCase()}`,
@@ -224,10 +262,60 @@ const getFriends = async (req, res) => {
     }
 };
 
+const removeFriend = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const friendId = Number(req.params.id);
+
+        if (!Number.isInteger(friendId) || friendId <= 0) {
+            return res.status(400).json({
+                message: "Valid friend ID is required"
+            });
+        }
+
+        const friendship = await prisma.friendRequest.findFirst({
+            where: {
+                status: "ACCEPTED",
+                OR: [
+                    { senderId: userId, receiverId: friendId },
+                    { senderId: friendId, receiverId: userId }
+                ]
+            }
+        });
+
+        if (!friendship) {
+            return res.status(404).json({
+                message: "Friendship not found"
+            });
+        }
+
+        await prisma.friendRequest.delete({
+            where: { id: friendship.id }
+        });
+
+        const io = req.app.get("io");
+        if (io) {
+            io.to(`user:${friendId}`).emit("friend-removed", { friendId: userId });
+            io.to(`user:${userId}`).emit("friend-removed", { friendId });
+        }
+
+        return res.status(200).json({
+            message: "Friend removed successfully"
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: "Failed to remove friend"
+        });
+    }
+};
+
 module.exports = {
     searchUsers,
     sendFriendRequest,
     getFriendRequests,
     respondToRequest,
-    getFriends
+    getFriends,
+    removeFriend
 };

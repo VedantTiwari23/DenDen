@@ -9,13 +9,19 @@ const prisma = require("./config/db");
 
 const server = http.createServer(app);
 
+const clientOrigin = process.env.CLIENT_URL
+    ? (process.env.CLIENT_URL.includes(",") ? process.env.CLIENT_URL.split(",").map(url => url.trim()) : process.env.CLIENT_URL)
+    : "http://localhost:5173";
+
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:5173",
+        origin: clientOrigin,
         methods: ["GET", "POST"],
         credentials: true
     }
 });
+
+app.set("io", io);
 
 const onlineUsers = new Map();
 
@@ -115,7 +121,7 @@ io.on("connection", (socket) => {
     });
 });
 
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 3000;
 
 server.listen(PORT, () => {
     console.log(`Denden server running on port ${PORT}`);

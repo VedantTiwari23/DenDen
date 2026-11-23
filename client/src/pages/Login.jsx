@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { MessageCircle, Video } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 import api from "../services/api";
 
 function Login() {
@@ -50,12 +50,11 @@ function Login() {
                     <h1>Connect Beyond Distance.</h1>
                     <p>
                         Stay close to the people who matter.
-                        Chat, connect and video call from anywhere.
+                        Fast, reliable real-time messaging from anywhere.
                     </p>
 
                     <div className="feature-icons">
                         <MessageCircle size={22} />
-                        <Video size={22} />
                         <span>Chat. Connect. Communicate.</span>
                     </div>
                 </div>

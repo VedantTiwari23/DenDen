@@ -8,8 +8,12 @@ const messageRoutes = require("./routes/messageRoutes");
 
 const app = express();
 
+const clientOrigin = process.env.CLIENT_URL
+    ? (process.env.CLIENT_URL.includes(",") ? process.env.CLIENT_URL.split(",").map(url => url.trim()) : process.env.CLIENT_URL)
+    : "http://localhost:5173";
+
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: clientOrigin,
     credentials: true
 }));
 
