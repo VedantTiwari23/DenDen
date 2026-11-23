@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { Search, UserPlus, Check, X, Users, MessageSquare, UserMinus, User } from "lucide-react";
+import { UserPlus, Check, X, Users, MessageSquare, UserMinus, User, ArrowLeft } from "lucide-react";
 import api from "../services/api";
 
-function Friends({ onStartChat, onFriendsUpdated, onlineUsers = [], socket }) {
+function Friends({ onStartChat, onFriendsUpdated, onlineUsers = [], socket, onBack }) {
     const [searchUsername, setSearchUsername] = useState("");
     const [searchResults, setSearchResults] = useState([]);
     const [searching, setSearching] = useState(false);
@@ -126,6 +126,11 @@ function Friends({ onStartChat, onFriendsUpdated, onlineUsers = [], socket }) {
             {/* Header */}
             <div className="friends-header">
                 <div className="friends-header-left">
+                    {onBack && (
+                        <button className="mobile-back-btn" onClick={onBack} title="Back to conversations">
+                            <ArrowLeft size={20} />
+                        </button>
+                    )}
                     <Users size={22} className="header-icon" />
                     <h2>Friends</h2>
                 </div>

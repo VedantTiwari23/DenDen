@@ -21,6 +21,14 @@ function Dashboard() {
 
     const user = JSON.parse(localStorage.getItem("user") || "{}");
 
+    // On mobile, whether to show the main area (chat or friends) or the sidebar
+    const showMainOnMobile = activeView === "friends" || selectedFriend !== null;
+
+    const handleBackToSidebar = () => {
+        setSelectedFriend(null);
+        setActiveView("chat");
+    };
+
     const loadFriendsData = async () => {
         try {
             const [friendsRes, requestsRes] = await Promise.all([
@@ -91,7 +99,7 @@ function Dashboard() {
     };
 
     return (
-        <div className="dashboard dark-theme">
+        <div className={`dashboard dark-theme ${showMainOnMobile ? "mobile-show-main" : "mobile-show-sidebar"}`}>
             {/* Left Sidebar: DM Area */}
             <aside className="sidebar">
                 <div className="sidebar-top">
@@ -189,6 +197,7 @@ function Dashboard() {
                         onFriendsUpdated={loadFriendsData}
                         onlineUsers={onlineUsers}
                         socket={socket}
+                        onBack={handleBackToSidebar}
                     />
                 ) : selectedFriend ? (
                     <Chat
@@ -196,6 +205,7 @@ function Dashboard() {
                         onlineUsers={onlineUsers}
                         user={user}
                         socket={socket}
+                        onBack={handleBackToSidebar}
                     />
                 ) : (
                     <div className="no-chat-selected">

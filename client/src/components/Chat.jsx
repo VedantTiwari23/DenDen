@@ -1,8 +1,8 @@
 import { useEffect, useState, useRef } from "react";
-import { Send, User } from "lucide-react";
+import { Send, User, ArrowLeft } from "lucide-react";
 import api from "../services/api";
 
-function Chat({ friend, onlineUsers, user, socket }) {
+function Chat({ friend, onlineUsers, user, socket, onBack }) {
     const [messages, setMessages] = useState([]);
     const [content, setContent] = useState("");
     const [error, setError] = useState("");
@@ -94,19 +94,26 @@ function Chat({ friend, onlineUsers, user, socket }) {
         <div className="conversation-container">
             {/* Conversation Topbar */}
             <div className="chat-topbar">
-                <div className="chat-topbar-user">
-                    <div className="avatar-wrapper">
-                        <div className="avatar">
-                            {friend.name ? friend.name.charAt(0).toUpperCase() : <User size={18} />}
+                <div className="chat-topbar-left">
+                    {onBack && (
+                        <button className="mobile-back-btn" onClick={onBack} title="Back to conversations">
+                            <ArrowLeft size={20} />
+                        </button>
+                    )}
+                    <div className="chat-topbar-user">
+                        <div className="avatar-wrapper">
+                            <div className="avatar">
+                                {friend.name ? friend.name.charAt(0).toUpperCase() : <User size={18} />}
+                            </div>
+                            <span className={`status-dot ${isOnline ? "online" : "offline"}`} />
                         </div>
-                        <span className={`status-dot ${isOnline ? "online" : "offline"}`} />
-                    </div>
 
-                    <div className="user-details">
-                        <strong className="name">{friend.name}</strong>
-                        <span className="status-text">
-                            {isOnline ? "Online" : "Offline"}
-                        </span>
+                        <div className="user-details">
+                            <strong className="name">{friend.name}</strong>
+                            <span className="status-text">
+                                {isOnline ? "Online" : "Offline"}
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
